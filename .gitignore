@@ -102,3 +102,10 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+
+# Mac
+.DS_Store
+
+# Large Files
+2018-11-13-raspbian-stretch-lite.img
