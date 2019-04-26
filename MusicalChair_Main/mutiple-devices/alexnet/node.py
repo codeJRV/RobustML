@@ -209,7 +209,7 @@ class Responder(ipc.Responder):
         node.log('node gets request back')
         client.close()
         queue.put(address)
-        raw_input("Press Enter to continue at node send function...")
+        
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -258,6 +258,9 @@ def main(cmd):
             if addr == '#':
                 break
             node.ip['initial'].put(addr)
+
+        print node.ip
+        raw_input("Press Enter to continue...")
 
     server = ThreadedHTTPServer(('0.0.0.0', 12345), Handler)
     server.allow_reuse_address = True
