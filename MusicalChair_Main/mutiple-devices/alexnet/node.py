@@ -259,7 +259,10 @@ def main(cmd):
                 break
             node.ip['initial'].put(addr)
 
-        print node.ip
+        for key,val in node.ip.items():
+            print key, "=>", list(val.queue)
+            
+
         raw_input("Press Enter to continue...")
 
     server = ThreadedHTTPServer(('0.0.0.0', 12345), Handler)
