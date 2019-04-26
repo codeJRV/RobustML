@@ -140,7 +140,7 @@ class Responder(ipc.Responder):
                         output = node.model.predict(np.array([X]))
                         node.log('finish block1 forward')
                         for _ in range(2):
-                            raw_input("Press Enter to continue...")
+                            raw_input("Press Enter to continue sending from block1...")
                             Thread(target=self.send, args=(output, 'block2', req['tag'])).start()
 
                     elif req['next'] == 'block2':
@@ -149,6 +149,7 @@ class Responder(ipc.Responder):
                         node.model = ml.fc1() if node.model is None else node.model
                         output = node.model.predict(np.array([X]))
                         node.log('finish block2 forward')
+                        raw_input("Press Enter to continue sending from block2...")
                         Thread(target=self.send, args=(output, 'block3', req['tag'])).start()
 
                     elif req['next'] == 'block3':
@@ -167,6 +168,7 @@ class Responder(ipc.Responder):
                         node.model = ml.fc2() if node.model is None else node.model
                         output = node.model.predict(np.array([X]))
                         node.log('finish model inference')
+                        raw_input("Press Enter to continue sending from block3...")
                         Thread(target=self.send, args=(output, 'initial', req['tag'])).start()
 
                 node.release_lock()
