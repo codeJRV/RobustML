@@ -209,7 +209,6 @@ class Responder(ipc.Responder):
         node.log('node gets request back')
         client.close()
         queue.put(address)
-
         raw_input("Press Enter to continue at node send function...")
 
 
