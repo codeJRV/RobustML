@@ -140,6 +140,7 @@ class Responder(ipc.Responder):
                         output = node.model.predict(np.array([X]))
                         node.log('finish block1 forward')
                         for _ in range(2):
+                            raw_input("Press Enter to continue...")
                             Thread(target=self.send, args=(output, 'block2', req['tag'])).start()
 
                     elif req['next'] == 'block2':
@@ -247,22 +248,22 @@ def main(cmd):
         node.ip['block3'] = Queue()
         node.ip['initial'] = Queue()
         address = address['node']
-        print address
+        # print address
         for addr in address['block2']:
             if addr == '#':
                 break
             node.ip['block2'].put(addr)
-            print "block2", addr, ","
+            # print "block2", addr, ","
         for addr in address['block3']:
             if addr == '#':
                 break
             node.ip['block3'].put(addr)
-            print "block3", addr, ","
+            # print "block3", addr, ","
         for addr in address['initial']:
             if addr == '#':
                 break
             node.ip['initial'].put(addr)
-            print "initial", addr, ","
+            # print "initial", addr, ","
 
         raw_input("Press Enter to continue...")
 
