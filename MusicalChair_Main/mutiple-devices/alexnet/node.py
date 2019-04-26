@@ -16,6 +16,7 @@ import numpy as np
 import tensorflow as tf
 import yaml
 import model as ml
+from copy import deepcopy
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
@@ -246,22 +247,22 @@ def main(cmd):
         node.ip['block3'] = Queue()
         node.ip['initial'] = Queue()
         address = address['node']
+        print address
         for addr in address['block2']:
             if addr == '#':
                 break
             node.ip['block2'].put(addr)
+            print "block2", addr, ","
         for addr in address['block3']:
             if addr == '#':
                 break
             node.ip['block3'].put(addr)
+            print "block3", addr, ","
         for addr in address['initial']:
             if addr == '#':
                 break
             node.ip['initial'].put(addr)
-
-        for key,val in node.ip.items():
-            print key, "=>", list(val.queue)
-            
+            print "initial", addr, ","
 
         raw_input("Press Enter to continue...")
 
