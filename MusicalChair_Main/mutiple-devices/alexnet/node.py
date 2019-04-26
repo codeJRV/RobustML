@@ -210,6 +210,8 @@ class Responder(ipc.Responder):
         client.close()
         queue.put(address)
 
+        raw_input("Press Enter to continue at node send function...")
+
 
 class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
