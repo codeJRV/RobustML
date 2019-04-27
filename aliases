@@ -1,0 +1,7 @@
+alias node2="mosh osboxes@192.168.0.2"
+alias node3="mosh osboxes@192.168.0.3"
+alias node4="mosh osboxes@192.168.0.4"
+alias node5="mosh osboxes@192.168.0.5"
+alias node1="mosh osboxes@192.168.0.1"
+
+
