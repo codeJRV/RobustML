@@ -114,6 +114,7 @@ def master():
         # current frame
         ret, frame = 'unknown', np.random.rand(224, 224, 3) * 255
         frame = frame.astype(dtype=np.uint8)
+        raw_input("Press Enter to intiate frame analysis...")
         Thread(target=send_request, args=(frame.tobytes(), 'block1', 'initial')).start()
         time.sleep(0.03)
 
@@ -162,6 +163,7 @@ class Handler(BaseHTTPRequestHandler):
         self.responder = Responder()
         call_request_reader = ipc.FramedReader(self.rfile)
         call_request = call_request_reader.read_framed_message()
+        print call_request
         resp_body = self.responder.respond(call_request)
         self.send_response(200)
         self.send_header('Content-Type', 'avro/binary')
