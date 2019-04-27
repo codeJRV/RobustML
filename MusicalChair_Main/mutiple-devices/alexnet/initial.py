@@ -164,7 +164,7 @@ class Handler(BaseHTTPRequestHandler):
         self.responder = Responder()
         call_request_reader = ipc.FramedReader(self.rfile)
         call_request = call_request_reader.read_framed_message()
-        print colored(call_request, 'red')
+        print colored("Returned inference", 'red')
         resp_body = self.responder.respond(call_request)
         self.send_response(200)
         self.send_header('Content-Type', 'avro/binary')
