@@ -15,6 +15,7 @@ import avro.protocol as protocol
 import avro.schema as schema
 import numpy as np
 import yaml
+from termcolor import colored
 
 # data packet format definition
 PROTOCOL = protocol.parse(open('resource/image.avpr').read())
@@ -163,7 +164,7 @@ class Handler(BaseHTTPRequestHandler):
         self.responder = Responder()
         call_request_reader = ipc.FramedReader(self.rfile)
         call_request = call_request_reader.read_framed_message()
-        print call_request
+        print colored(call_request, 'red')
         resp_body = self.responder.respond(call_request)
         self.send_response(200)
         self.send_header('Content-Type', 'avro/binary')
