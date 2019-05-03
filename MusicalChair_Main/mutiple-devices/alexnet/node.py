@@ -18,6 +18,7 @@ import tensorflow as tf
 import yaml
 import model as ml
 from copy import deepcopy
+from termcolor import colored
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
@@ -227,12 +228,15 @@ class Responder(ipc.Responder):
 
         #and then check the response...
         if response == 0:
-            print address, 'is up! sending'
+            msg =  address +  ' is up! sending'
+            print colored(msg, green)
         else:
             oldaddress = address
             address = backupq.get()
             backup_used = True
-            print oldaddress, 'is down! sending to backup node ', address
+            
+            msg =  oldaddress + ' is down! sending to backup node ' + address
+            print colored(msg, red)
 
 
         client = ipc.HTTPTransceiver(address, port)
@@ -247,7 +251,7 @@ class Responder(ipc.Responder):
         node.log('finish assembly')
         start = time.time()
 
-        raw_input("Press Enter to send to next block...")
+        #raw_input("Press Enter to send to next block...")
         requestor.request('forward', data)
 
         end = time.time()
