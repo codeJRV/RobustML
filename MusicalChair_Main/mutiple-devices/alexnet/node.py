@@ -252,7 +252,7 @@ class Responder(ipc.Responder):
         client.close()
         queue.put(address)
         
-    def not_backup():
+    def not_backup(self):
         p = subprocess.Popen("ip -4 addr | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep 192.168", 
                             stdout=subprocess.PIPE, shell=True)
         (output, err) = p.communicate()
