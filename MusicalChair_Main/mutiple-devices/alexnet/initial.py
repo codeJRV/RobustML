@@ -49,7 +49,8 @@ class Initializer:
         if self.count == 0:
             self.start = time.time()
         else:
-            print 'total time: {:.3f} sec'.format((time.time() - self.start) / self.count)
+            msg = "Returned inference in " + ': {:.3f} sec'.format((time.time() - self.start) / self.count)
+            print colored(msg , 'green')
         self.count += 1
 
     def node_timer(self, mode, interval):
@@ -115,9 +116,9 @@ def master():
         # current frame
         ret, frame = 'unknown', np.random.rand(224, 224, 3) * 255
         frame = frame.astype(dtype=np.uint8)
-        raw_input("Press Enter to intiate frame analysis...")
+        print colored("Sending Frame to network",'yellow')
         Thread(target=send_request, args=(frame.tobytes(), 'block1', 'initial')).start()
-        time.sleep(0.03)
+        time.sleep(0.1)
 
 
 class Responder(ipc.Responder):
@@ -164,7 +165,6 @@ class Handler(BaseHTTPRequestHandler):
         self.responder = Responder()
         call_request_reader = ipc.FramedReader(self.rfile)
         call_request = call_request_reader.read_framed_message()
-        print colored("Returned inference", 'green')
         resp_body = self.responder.respond(call_request)
         self.send_response(200)
         self.send_header('Content-Type', 'avro/binary')
