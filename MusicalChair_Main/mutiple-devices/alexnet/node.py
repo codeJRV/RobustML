@@ -230,7 +230,7 @@ class Responder(ipc.Responder):
             oldaddress = address
             backup = node.ip['backup']
             address = backup.get()
-            print oldaddress, 'is down! sending to backup node' address
+            print oldaddress, 'is down! sending to backup node ', address
 
 
         client = ipc.HTTPTransceiver(address, port)
