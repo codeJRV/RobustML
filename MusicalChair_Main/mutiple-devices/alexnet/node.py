@@ -24,6 +24,8 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # read data packet format.
 PROTOCOL = protocol.parse(open('resource/image.avpr').read())
 
+backups = []
+
 
 class Node(object):
     """
@@ -59,7 +61,7 @@ class Node(object):
         self.total = 0
         self.count = 1
         self.input = deque()
-        self.backups = []
+
 
 
     def log(self, step, data=''):
@@ -256,7 +258,7 @@ class Responder(ipc.Responder):
         p = subprocess.Popen("ip -4 addr | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep 192.168", 
                             stdout=subprocess.PIPE, shell=True)
         (output, err) = p.communicate()
-        if output in self.backups:
+        if output in backups:
             return False
         return True
 
@@ -318,7 +320,7 @@ def main(cmd):
             if addr == '#':
                 break
             node.ip['backup'].put(addr)
-            node.backups.append(addr)
+            backups.append(addr)
             # print "initial", addr, ","
 
         raw_input("Press Enter to continue...")
