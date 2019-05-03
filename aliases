@@ -5,5 +5,8 @@ alias node4="mosh osboxes@192.168.0.4"
 alias node5="mosh osboxes@192.168.0.5"
 alias node6="mosh osboxes@192.168.0.6"
 alias node7="mosh osboxes@192.168.0.7"
+alias inkill="kill $(ps aux | grep '[p]ython initial.py' | awk '{print $2}')"
+alias nkill="kill $(ps aux | grep '[p]ython node.py' | awk '{print $2}')"
+
 
 

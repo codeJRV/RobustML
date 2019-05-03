@@ -227,9 +227,10 @@ class Responder(ipc.Responder):
         if response == 0:
             print address, 'is up! sending'
         else:
-            print hostname, 'is down! sending to backup node'
+            oldaddress = address
             backup = node.ip['backup']
             address = backup.get()
+            print oldaddress, 'is down! sending to backup node' address
 
 
         client = ipc.HTTPTransceiver(address, port)
@@ -255,12 +256,16 @@ class Responder(ipc.Responder):
         queue.put(address)
         
     def not_backup(self):
-        p = subprocess.Popen("ip -4 addr | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep 192.168", 
-                            stdout=subprocess.PIPE, shell=True)
-        (output, err) = p.communicate()
-        if output in backups:
+       
+        if self.myip() in backups:
             return False
         return True
+
+    def myip(self):
+         p = subprocess.Popen("ip -4 addr | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep 192.168", 
+                            stdout=subprocess.PIPE, shell=True)
+        (output, err) = p.communicate()
+        return output
 
         
 
