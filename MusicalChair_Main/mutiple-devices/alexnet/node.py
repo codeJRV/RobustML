@@ -262,7 +262,7 @@ class Responder(ipc.Responder):
         return True
 
     def myip(self):
-         p = subprocess.Popen("ip -4 addr | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep 192.168", 
+        p = subprocess.Popen("ip -4 addr | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep 192.168", 
                             stdout=subprocess.PIPE, shell=True)
         (output, err) = p.communicate()
         return output
