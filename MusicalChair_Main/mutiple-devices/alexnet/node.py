@@ -229,14 +229,14 @@ class Responder(ipc.Responder):
         #and then check the response...
         if response == 0:
             msg =  address +  ' is up! sending'
-            print colored(msg, green)
+            print colored(msg, 'green')
         else:
             oldaddress = address
             address = backupq.get()
             backup_used = True
             
             msg =  oldaddress + ' is down! sending to backup node ' + address
-            print colored(msg, red)
+            print colored(msg, 'red')
 
 
         client = ipc.HTTPTransceiver(address, port)
