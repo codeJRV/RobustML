@@ -159,7 +159,7 @@ class Responder(ipc.Responder):
                         if self.not_backup():
                             node.model = ml.fc1() if node.model is None else node.model
                         else:
-                            node.model = ml.block1()
+                            node.model = ml.fc1()
 
 
                         output = node.model.predict(np.array([X]))
@@ -183,7 +183,7 @@ class Responder(ipc.Responder):
                         if self.not_backup():
                             node.model = ml.fc2() if node.model is None else node.model
                         else:
-                            node.model = ml.block1()
+                            node.model = ml.fc2()
                         
                         output = node.model.predict(np.array([X]))
                         node.log('finish model inference')
@@ -210,6 +210,8 @@ class Responder(ipc.Responder):
         """
         node = Node.create()
         queue = node.ip[name]
+        backupq = node.ip['backup']
+        backup_used = False
 
         address = queue.get()
 
@@ -228,8 +230,8 @@ class Responder(ipc.Responder):
             print address, 'is up! sending'
         else:
             oldaddress = address
-            backup = node.ip['backup']
-            address = backup.get()
+            address = backupq.get()
+            backup_used = True
             print oldaddress, 'is down! sending to backup node ', address
 
 
@@ -253,7 +255,13 @@ class Responder(ipc.Responder):
 
         node.log('node gets request back')
         client.close()
-        queue.put(address)
+
+        if backup_used:
+            queue.put(oldaddress)
+            backupq.put(address)
+        else:
+            queue.put(address)
+
         
     def not_backup(self):
        
