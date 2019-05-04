@@ -286,9 +286,7 @@ class Responder(ipc.Responder):
         result = True if err is None else False
         return result
         
-    def process(self,req,)
 
-        
 
 
 class Handler(BaseHTTPRequestHandler):
