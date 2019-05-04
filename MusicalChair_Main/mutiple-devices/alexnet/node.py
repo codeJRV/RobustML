@@ -19,6 +19,7 @@ import yaml
 import model as ml
 from copy import deepcopy
 from termcolor import colored
+import socket
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
@@ -280,12 +281,12 @@ class Responder(ipc.Responder):
         return output
 
     def check_ip(self, address):
-        cmd = "ping -c 1 " + address
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
-        (output, err) = p.communicate()
-        result = True if err is None else False
-        return result
-        
+        try:
+            s = socket.create_connection((address, 80), 2)
+        return True
+        except:
+            pass
+        return False
 
 
 
