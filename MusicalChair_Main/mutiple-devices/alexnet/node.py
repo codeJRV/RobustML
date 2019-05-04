@@ -282,7 +282,7 @@ class Responder(ipc.Responder):
 
     def check_ip(self, address):
         try:
-            s = socket.create_connection((address, 80), 2)
+            s = socket.create_connection((address, 12345), 2)
             return True
         except:
             pass
