@@ -227,7 +227,7 @@ class Responder(ipc.Responder):
         response = os.system("ping -c 1 " + address)
 
         #and then check the response...
-        if self.check_ip(address) == 0:
+        if self.check_ip(address):
             msg =  address +  ' is up! sending'
             print colored(msg, 'green')
         else:
@@ -283,8 +283,8 @@ class Responder(ipc.Responder):
         cmd = "ping -c 1 " + address
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
         (output, err) = p.communicate()
-        print err
-        return err
+        if err == None return True else False
+        
 
         
 
