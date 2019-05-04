@@ -233,7 +233,6 @@ class Responder(ipc.Responder):
             print colored(msg, 'green')
         else:
             oldaddress = address
-
             address = backupq.get()
             backup_used = True
             msg =  oldaddress + ' is down! sending to backup node ' + address
@@ -282,7 +281,7 @@ class Responder(ipc.Responder):
 
     def check_ip(self, address):
         try:
-            s = socket.create_connection((address, 12345), 2)
+            s = socket.create_connection((address, 22), 2)
             return True
         except:
             pass
