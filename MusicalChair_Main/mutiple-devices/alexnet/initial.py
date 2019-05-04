@@ -101,6 +101,8 @@ def send_request(bytestr, mode, tag=''):
 
     init.node_timer(mode, end - start)
 
+
+
     client.close()
     queue.put(addr)
 
@@ -112,13 +114,13 @@ def master():
         and pop the least recent one if the length > maximum.
     """
     init = Initializer.create_init()
-    while True:
-        # current frame
-        ret, frame = 'unknown', np.random.rand(224, 224, 3) * 255
-        frame = frame.astype(dtype=np.uint8)
-        print colored("Sending Frame to network",'yellow')
-        Thread(target=send_request, args=(frame.tobytes(), 'block1', 'initial')).start()
-        time.sleep(0.1)
+    # while True:
+    #     # current frame
+    ret, frame = 'unknown', np.random.rand(224, 224, 3) * 255
+    frame = frame.astype(dtype=np.uint8)
+    print colored("Sending Frame to network",'yellow')
+    Thread(target=send_request, args=(frame.tobytes(), 'block1', 'initial')).start()
+
 
 
 class Responder(ipc.Responder):
@@ -147,6 +149,7 @@ class Responder(ipc.Responder):
             init = Initializer.create_init()
             try:
                 init.timer()
+                master()  # Call master after message recieved back?
                 return
             except Exception, e:
                 print 'Error', e.message
