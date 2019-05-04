@@ -227,14 +227,14 @@ class Responder(ipc.Responder):
         response = os.system("ping -c 1 " + address)
 
         #and then check the response...
-        if response == 0:
+        if self.check_ip(address) == 0:
             msg =  address +  ' is up! sending'
             print colored(msg, 'green')
         else:
             oldaddress = address
+
             address = backupq.get()
             backup_used = True
-            
             msg =  oldaddress + ' is down! sending to backup node ' + address
             print colored(msg, 'red')
 
@@ -278,6 +278,12 @@ class Responder(ipc.Responder):
                             stdout=subprocess.PIPE, shell=True)
         (output, err) = p.communicate()
         return output
+
+    def check_ip(self, address):
+        cmd = "ping -c 1 " + address
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+        (output, err) = p.communicate()
+        return err
 
         
 
