@@ -347,7 +347,7 @@ def main(cmd):
             backups.append(addr)
             # print "initial", addr, ","
 
-        raw_input("Press Enter to continue...")
+        #raw_input("Press Enter to continue...")
 
     server = ThreadedHTTPServer(('0.0.0.0', 12345), Handler)
     server.allow_reuse_address = True
