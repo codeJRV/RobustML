@@ -224,7 +224,7 @@ class Responder(ipc.Responder):
         # Fault Tolerance Straregy 2: check if node recieved, but failed to forward to next
         # Fault Tolerance Strategy 3: check if initial doesn't recieve input within some time, then resend 
 
-        response = os.system("ping -c 1 " + address)
+        response = os.system("ping -c 3 " + address)
 
         #and then check the response...
         if self.check_ip(address):
@@ -286,6 +286,7 @@ class Responder(ipc.Responder):
         result = True if err is None else False
         return result
         
+    def process(self,req,)
 
         
 
