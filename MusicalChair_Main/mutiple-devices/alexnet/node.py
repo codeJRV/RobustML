@@ -283,6 +283,7 @@ class Responder(ipc.Responder):
         cmd = "ping -c 1 " + address
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
         (output, err) = p.communicate()
+        print err
         return err
 
         
