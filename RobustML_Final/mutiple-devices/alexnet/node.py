@@ -4,6 +4,7 @@
 import argparse
 import os
 import time
+import subprocess
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from SocketServer import ThreadingMixIn
 from collections import deque
@@ -16,11 +17,16 @@ import numpy as np
 import tensorflow as tf
 import yaml
 import model as ml
+from copy import deepcopy
+from termcolor import colored
+import socket
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 # read data packet format.
 PROTOCOL = protocol.parse(open('resource/image.avpr').read())
+
+backups = []
 
 
 class Node(object):
@@ -57,6 +63,8 @@ class Node(object):
         self.total = 0
         self.count = 1
         self.input = deque()
+
+
 
     def log(self, step, data=''):
         """
@@ -135,7 +143,12 @@ class Responder(ipc.Responder):
                     if req['next'] == 'block1':
                         node.log('block1 gets data')
                         X = np.fromstring(bytestr, np.uint8).reshape(224, 224, 3)
-                        node.model = ml.block1() if node.model is None else node.model
+
+                        if self.not_backup():
+                            node.model = ml.block1() if node.model is None else node.model
+                        else:
+                            node.model = ml.block1()
+
                         output = node.model.predict(np.array([X]))
                         node.log('finish block1 forward')
                         for _ in range(2):
@@ -144,7 +157,13 @@ class Responder(ipc.Responder):
                     elif req['next'] == 'block2':
                         node.log('block2 gets data')
                         X = np.fromstring(bytestr, np.float32).reshape(6272)
-                        node.model = ml.fc1() if node.model is None else node.model
+
+                        if self.not_backup():
+                            node.model = ml.fc1() if node.model is None else node.model
+                        else:
+                            node.model = ml.fc1()
+
+
                         output = node.model.predict(np.array([X]))
                         node.log('finish block2 forward')
                         Thread(target=self.send, args=(output, 'block3', req['tag'])).start()
@@ -162,9 +181,15 @@ class Responder(ipc.Responder):
                         while len(node.input) > 2:
                             node.input.popleft()
                         X = np.concatenate(node.input)
-                        node.model = ml.fc2() if node.model is None else node.model
+
+                        if self.not_backup():
+                            node.model = ml.fc2() if node.model is None else node.model
+                        else:
+                            node.model = ml.fc2()
+                        
                         output = node.model.predict(np.array([X]))
                         node.log('finish model inference')
+                        
                         Thread(target=self.send, args=(output, 'initial', req['tag'])).start()
 
                 node.release_lock()
@@ -187,10 +212,33 @@ class Responder(ipc.Responder):
         """
         node = Node.create()
         queue = node.ip[name]
+        backupq = node.ip['backup']
+        backup_used = False
+
         address = queue.get()
+
 
         # initializer use port 9999 to receive data
         port = 9999 if name == 'initial' else 12345
+
+        # Fault Tolerance Strategy 1: check if node not available, then send to backup node
+        # Fault Tolerance Straregy 2: check if node recieved, but failed to forward to next
+        # Fault Tolerance Strategy 3: check if initial doesn't recieve input within some time, then resend 
+
+        response = os.system("ping -c 3 " + address)
+
+        #and then check the response...
+        if self.check_ip(address):
+            msg =  address +  ' is up! sending'
+            print colored(msg, 'green')
+        else:
+            oldaddress = address
+            address = backupq.get()
+            backup_used = True
+            msg =  oldaddress + ' is down! sending to backup node ' + address
+            print colored(msg, 'red')
+
+
         client = ipc.HTTPTransceiver(address, port)
         requestor = ipc.Requestor(PROTOCOL, client)
 
@@ -202,13 +250,43 @@ class Responder(ipc.Responder):
         data['tag'] = tag
         node.log('finish assembly')
         start = time.time()
+
+        #raw_input("Press Enter to send to next block...")
         requestor.request('forward', data)
+
         end = time.time()
         node.timer(end - start)
 
         node.log('node gets request back')
         client.close()
-        queue.put(address)
+
+        if backup_used:
+            queue.put(oldaddress)
+            backupq.put(address)
+        else:
+            queue.put(address)
+
+        
+    def not_backup(self):
+       
+        if self.myip() in backups:
+            return False
+        return True
+
+    def myip(self):
+        p = subprocess.Popen("ip -4 addr | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep 192.168", 
+                            stdout=subprocess.PIPE, shell=True)
+        (output, err) = p.communicate()
+        return output
+
+    def check_ip(self, address):
+        try:
+            s = socket.create_connection((address, 22), 2)
+            return True
+        except:
+            pass
+        return False
+
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -244,19 +322,32 @@ def main(cmd):
         node.ip['block2'] = Queue()
         node.ip['block3'] = Queue()
         node.ip['initial'] = Queue()
+        node.ip['backup'] = Queue()
         address = address['node']
+        # print address
         for addr in address['block2']:
             if addr == '#':
                 break
             node.ip['block2'].put(addr)
+            # print "block2", addr, ","
         for addr in address['block3']:
             if addr == '#':
                 break
             node.ip['block3'].put(addr)
+            # print "block3", addr, ","
         for addr in address['initial']:
             if addr == '#':
                 break
             node.ip['initial'].put(addr)
+            # print "initial", addr, ","
+        for addr in address['backup']:
+            if addr == '#':
+                break
+            node.ip['backup'].put(addr)
+            backups.append(addr)
+            # print "initial", addr, ","
+
+        #raw_input("Press Enter to continue...")
 
     server = ThreadedHTTPServer(('0.0.0.0', 12345), Handler)
     server.allow_reuse_address = True
